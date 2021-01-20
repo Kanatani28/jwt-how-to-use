@@ -1,0 +1,11 @@
+version: '3'
+services:
+  front:
+    build: docker
+    tty: true
+    volumes:
+      - ./:/app
+    command: sh -c "yarn install && yarn start"
+    ports:
+      - "3000:3000"
+      - "3001:3001"
