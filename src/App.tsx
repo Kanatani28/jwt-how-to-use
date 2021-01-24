@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './App.css';
 
@@ -30,6 +30,15 @@ function App() {
   const [jwt, setJwt] = useState<string | null>(null);
   const [foods, setFoods] = useState<Food[]>([]);
   const [fetchError, setFetchError] = useState(null);
+
+  useEffect(() => {
+    const getCsrfToken = async () => {
+      const { data } = await axios.get(`${apiUrl}/csrf-token`);
+      axios.defaults.headers.post['X-CSRF-Token'] = data.csrfToken;
+    };
+    getCsrfToken();
+  }, []);
+
   
   const getJwt = async () => {
     const { data } = await axios.get(`${apiUrl}/jwt`);
@@ -41,6 +50,17 @@ function App() {
     try {
       const { data } = await axios.get(`${apiUrl}/foods`);
       setFoods(data);
+      setFetchError(null);
+    } catch (err) {
+      setFetchError(err.message);
+    }
+  };
+
+  const [newFoodMessage, setNewFoodMessage] = useState(null);
+  const createFood = async () => {
+    try {
+      const { data } = await axios.post(`${apiUrl}/foods`);
+      setNewFoodMessage(data.message);
       setFetchError(null);
     } catch (err) {
       setFetchError(err.message);
@@ -69,6 +89,12 @@ function App() {
         {fetchError && (
           <p style={{ color: 'red' }}>{fetchError}</p>
         )}
+      </section>
+      <section>
+        <button onClick={() => createFood()}>
+          Create New Food
+        </button>
+        {newFoodMessage && <p>{newFoodMessage}</p>}
       </section>
     </>
   );
