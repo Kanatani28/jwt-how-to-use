@@ -4,20 +4,21 @@ import './App.css';
 
 const apiUrl = 'http://localhost:3001';
 
-axios.interceptors.request.use(
-  config => {
-    const { origin } = new URL(config.url as string);
-    const allowedOrigins = [apiUrl];
-    const token = localStorage.getItem('token');
-    if (allowedOrigins.includes(origin)) {
-      config.headers.authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  error => {
-    return Promise.reject(error);
-  }
-);
+// axios.interceptors.request.use(
+//   config => {
+//     const { origin } = new URL(config.url as string);
+//     const allowedOrigins = [apiUrl];
+//     const token = localStorage.getItem('token');
+//     if (allowedOrigins.includes(origin)) {
+//       config.headers.authorization = `Bearer ${token}`;
+//     }
+//     return config;
+//   },
+//   error => {
+//     return Promise.reject(error);
+//   }
+// );
+axios.defaults.withCredentials = true;
 
 type Food = {
   id: number
@@ -25,14 +26,14 @@ type Food = {
 }
 
 function App() {
-  const storedJwt = localStorage.getItem('token');
-  const [jwt, setJwt] = useState(storedJwt || null);
+  // const storedJwt = localStorage.getItem('token');
+  const [jwt, setJwt] = useState<string | null>(null);
   const [foods, setFoods] = useState<Food[]>([]);
   const [fetchError, setFetchError] = useState(null);
   
   const getJwt = async () => {
     const { data } = await axios.get(`${apiUrl}/jwt`);
-    localStorage.setItem('token', data.token);
+    // localStorage.setItem('token', data.token);
     setJwt(data.token);
   };
 
